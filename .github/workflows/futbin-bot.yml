@@ -1,0 +1,43 @@
+name: FUTBIN-Preisbot
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # alle 10 Minuten (GitHub startet oft ein paar Minuten verspätet)
+  workflow_dispatch:          # erlaubt manuelles Starten über den "Run workflow"-Knopf
+
+concurrency:
+  group: futbin-bot
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      # state.txt merkt sich, wofür schon benachrichtigt wurde -> keine doppelten Pushes
+      - name: Zustand laden
+        uses: actions/cache/restore@v4
+        with:
+          path: state.txt
+          key: futbin-state-${{ github.run_id }}
+          restore-keys: futbin-state-
+
+      - name: Preise prüfen
+        run: java -Djava.awt.headless=true src/Main.java
+        env:
+          RUN_ONCE: "true"
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+
+      - name: Zustand speichern
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: state.txt
+          key: futbin-state-${{ github.run_id }}
