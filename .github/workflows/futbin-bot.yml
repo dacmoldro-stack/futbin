@@ -1,8 +1,9 @@
 name: FUTBIN-Preisbot
 
 on:
-  schedule:
-    - cron: "*/10 * * * *"   # alle 10 Minuten (GitHub startet oft ein paar Minuten verspätet)
+  # Zeitplan abgeschaltet: FUTBIN blockt GitHub-Server (HTTP 403). Zum Reaktivieren die zwei Zeilen wieder einkommentieren.
+  # schedule:
+  #   - cron: "*/10 * * * *"   # alle 10 Minuten (GitHub startet oft ein paar Minuten verspätet)
   workflow_dispatch:          # erlaubt manuelles Starten über den "Run workflow"-Knopf
 
 concurrency:
